@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+        }
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background-color: #495057;
+        }
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #007bff;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .header {
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .profile-card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .password-card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 d-none d-md-block position-fixed sidebar">
+                <h3 class="text-center mb-4">Admin Panel</h3>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="profile-link">
+                            <i class="bi bi-person"></i> Profil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="password-link">
+                            <i class="bi bi-key"></i> Mot de passe
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
+                        <a class="nav-link text-danger" href="#" id="logout-link">
+                            <i class="bi bi-box-arrow-right"></i> Déconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10 ms-sm-auto px-4">
+                <div class="header d-flex justify-content-between align-items-center">
+                    <h2>Tableau de bord</h2>
+                    <span id="admin-name">Chargement...</span>
+                </div>
+                
+                <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+                <div id="success-message" class="alert alert-success d-none" role="alert"></div>
+                
+                <!-- Profile Section -->
+                <div id="profile-section">
+                    <div class="profile-card p-4 bg-white">
+                        <h3 class="mb-4">Mon Profil</h3>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <strong>Nom</strong>
+                            </div>
+                            <div class="col-md-9 mb-3">
+                                <span id="profile-name">Chargement...</span>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <strong>Email</strong>
+                            </div>
+                            <div class="col-md-9 mb-3">
+                                <span id="profile-email">Chargement...</span>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <strong>Date d'inscription</strong>
+                            </div>
+                            <div class="col-md-9 mb-3">
+                                <span id="profile-date">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password Change Section -->
+                <div id="password-section" class="d-">
+                    <div class="password-card p-4 bg-white">
+                        <h3 class="mb-4">Changer mon mot de passe</h3>
+                        <form id="change-password-form">
+                            <div class="mb-3">
+                                <label for="current-password" class="form-label">Mot de passe actuel</label>
+                                <input type="password" class="form-control" id="current-password" name="current-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new-password" class="form-label">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="new-password" name="new-password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm-new-password" class="form-label">Confirmer le nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="confirm-new-password" name="confirm-new-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Mettre à jour le mot de passe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier l'authentification
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Éléments DOM
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            const profileSection = document.getElementById('profile-section');
+            const passwordSection = document.getElementById('password-section');
+            const profileLink = document.getElementById('profile-link');
+            const passwordLink = document.getElementById('password-link');
+            const logoutLink = document.getElementById('logout-link');
+            const adminName = document.getElementById('admin-name');
+            const profileName = document.getElementById('profile-name');
+            const profileEmail = document.getElementById('profile-email');
+            const profileDate = document.getElementById('profile-date');
+            const changePasswordForm = document.getElementById('change-password-form');
+            
+            // Charger les informations de l'administrateur
+            async function loadProfile() {
+                try {
+                    const response = await fetch('/ltsatest/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        if(response.status === 401) {
+                            localStorage.removeItem('token');
+                            window.location.href = 'login.html';
+                            return;
+                        }
+                        throw new Error('Erreur lors du chargement du profil');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Mettre à jour les informations
+                    adminName.textContent = data.nom;
+                    profileName.textContent = data.nom;
+                    profileEmail.textContent = data.email;
+                    
+                    // Formater la date
+                    const date = new Date(data.created_at);
+                    profileDate.textContent = date.toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                } catch (error) {
+                    errorMessage.textContent = error.message;
+                    errorMessage.classList.remove('d-none');
+                }
+            }
+            
+            // Changer de section
+            profileLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                profileSection.classList.remove('d-none');
+                passwordSection.classList.add('d-none');
+                profileLink.classList.add('active');
+                passwordLink.classList.remove('active');
+            });
+            
+            passwordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                profileSection.classList.add('d-none');
+                passwordSection.classList.remove('d-none');
+                profileLink.classList.remove('active');
+                passwordLink.classList.add('active');
+            });
+            
+            // Déconnexion
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            });
+            
+            // Changement de mot de passe
+            changePasswordForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Masquer les messages
+                errorMessage.classList.add('d-none');
+                successMessage.classList.add('d-none');
+                
+                // Récupérer les valeurs
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmNewPassword = document.getElementById('confirm-new-password').value;
+            });
+            
+                // Vérifier que les mots de passe correspondent
+                if (newPassword !== confirmNewPassword) {
+                    errorMessage.textContent = 'Les mots de passe ne correspondent pas';
+                    errorMessage.classList.remove('d-none');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/ltsatest/update-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({
+                            current_password: currentPassword,
+                            new_password: newPassword
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Erreur lors du changement de mot de passe');
+                    }
+                    
+                    successMessage.textContent = 'Mot de passe changé avec succès';
+                    successMessage.classList.remove('d-none');
+                    
+                } catch (error) {
+                    errorMessage.textContent = error.message;
+                    errorMessage.classList.remove('d-none');
+                }
+            });
+            
